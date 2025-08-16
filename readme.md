@@ -37,16 +37,9 @@ Duplicate names are allowed; identity is by UUID.
 
 ---
 
-# Special request - Monthly-Bucket Algorithm:
+# Special request solution - Monthly-Bucket Algorithm:
 
-### Overview
-
-Maintain fixed-size **monthly buckets** per hospital and sex to answer:
-
-> “Average age of visitors per month, by sex, for the last 10 years”  
-> in predictable, sub-200 ms time.
-
-## Data Stored
+### Data Stored
 
 For hospital `H`, calendar month `M`, and sex `S`, store:
 
@@ -58,7 +51,13 @@ Where:
 - `visits_count` = number of visits in that bucket.
 - `age_days_sum` = sum of `daysBetween(patientDOB, visitDate)` over visits in the bucket.
 
-## Update Operation (Per Visit)
+## Complexity
+
+- **Time (update):** O(1) per visit.
+- **Time (query):** O(120 × |S|) ~ O(1).
+- **Space:** O(#hospitals × 120 × |S|) ~ O(1) (if each hospital only stores their own instance -> |H| = 1).
+
+### Update Operation (Per Visit)
 
 1. Compute `bucketMonth = floorMonth(visitDate)`.
 2. Compute `ageDays = daysBetween(DOB, visitDate)`.
@@ -68,7 +67,7 @@ Where:
 
 Expected constant time with a hash map; effectively constant with a DB.
 
-## Query Operation (Last 10 Years) - O(120 × |S|) ≈ O(1)
+### Query Operation (Last 10 Years) - O(120 × |S|) ≈ O(1)
 
 Given `hospitalId` and “now”:
 
@@ -80,12 +79,6 @@ Given `hospitalId` and “now”:
    '''
 
 At most `120 × |S|` lookups (<= 480), which is effectively constant.
-
-### Complexity
-
-- **Time (update):** O(1) per visit.
-- **Time (query):** O(120 × |S|) ~ O(1).
-- **Space:** O(#hospitals × 120 × |S|) ~ O(1) (if each hospital only stores their own instance -> |H| = 1).
 
 ### Retention
 
