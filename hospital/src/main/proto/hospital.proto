@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package hospital.v1;
+
+option java_multiple_files = true;
+option java_package = "avelios.hospital.grpc";
+
+import "google/protobuf/empty.proto";
+
+// ------------ Services ------------
+
+service HospitalService {
+    rpc CreateHospital (CreateHospitalRequest) returns (HospitalId);
+    rpc UpdateHospital (UpdateHospitalRequest) returns (Hospital);
+    rpc DeleteHospital (HospitalId) returns (google.protobuf.Empty);
+    
+    rpc ListHospitals (google.protobuf.Empty) returns (HospitalList);
+    rpc ListPatientsOfHospital (HospitalId) returns (PatientList);
+}
+
+service PatientService {
+    rpc CreatePatient (CreatePatientRequest) returns (PatientId);
+    rpc UpdatePatient (UpdatePatientRequest) returns (Patient);
+    rpc DeletePatient (PatientId) returns (google.protobuf.Empty);
+    
+    rpc ListPatients (google.protobuf.Empty) returns (PatientList);
+    rpc ListHospitalsOfPatient (PatientId) returns (HospitalList);
+}
+
+// ------------ Messages ------------
+
+message HospitalId {
+    string id = 1;
+}
+
+message PatientId {
+    string id = 1;
+}
+
+message Hospital {
+    string id = 1;
+    string name = 2;
+}
+
+message Patient {
+    string id = 1;
+    string name = 2;
+}
+
+message CreateHospitalRequest {
+    string name = 1;
+}
+
+message UpdateHospitalRequest {
+    string id = 1;
+    string name = 2;
+}
+
+message CreatePatientRequest {
+    string name = 1;
+}
+
+message UpdatePatientRequest {
+    string id = 1;
+    string name = 2;
+}
+
+message HospitalTuple {
+    string id = 1;
+    string name = 2;
+}
+
+message PatientTuple {
+    string id = 1;
+    string name = 2;
+}
+
+message HospitalList {
+    repeated HospitalTuple hospitals = 1;
+}
+
+message PatientList {
+    repeated PatientTuple patients = 1;
+}
