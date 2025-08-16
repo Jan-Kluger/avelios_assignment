@@ -58,7 +58,7 @@ Where:
 - `visits_count` = number of visits in that bucket.
 - `age_days_sum` = sum of `daysBetween(patientDOB, visitDate)` over visits in the bucket.
 
-### Update Operation (Per Visit) — O(1)
+## Update Operation (Per Visit)
 
 1. Compute `bucketMonth = floorMonth(visitDate)`.
 2. Compute `ageDays = daysBetween(DOB, visitDate)`.
@@ -68,7 +68,7 @@ Where:
 
 Expected constant time with a hash map; effectively constant with a DB.
 
-### Query Operation (Last 10 Years) — O(120 × |S|) ≈ O(1)
+## Query Operation (Last 10 Years) - O(120 × |S|) ≈ O(1)
 
 Given `hospitalId` and “now”:
 
@@ -94,7 +94,7 @@ To keep storage bounded:
 - Scheduled job deletes raw `Visit` rows older than 10 years.
 - Queries always filter to the last 120 months.
 
-### Mid-Month Granularity Issue
+## Mid-Month Granularity Issue
 
 Buckets are **monthly**, so mid-month requests raise a policy choice:
 
