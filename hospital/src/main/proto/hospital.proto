@@ -5,29 +5,35 @@ package hospital.v1;
 option java_multiple_files = true;
 option java_package = "avelios.hospital.grpc";
 
-import "google/protobuf/empty.proto";
-
-// ------------ Services ------------
-
 service HospitalService {
-    rpc CreateHospital (CreateHospitalRequest) returns (HospitalId);
-    rpc UpdateHospital (UpdateHospitalRequest) returns (Hospital);
-    rpc DeleteHospital (HospitalId) returns (google.protobuf.Empty);
-    
-    rpc ListHospitals (google.protobuf.Empty) returns (HospitalList);
-    rpc ListPatientsOfHospital (HospitalId) returns (PatientList);
+    rpc CreateHospital (CreateHospitalRequest)    returns (HospitalId);
+    rpc UpdateHospital (UpdateHospitalRequest)    returns (Hospital);
+    rpc DeleteHospital (HospitalId)               returns (DeleteHospitalResponse);
+    rpc ListHospitals (ListHospitalsRequest)      returns (HospitalList);
+    rpc ListPatientsOfHospital (HospitalId)       returns (PatientList);
+    rpc RegisterPatient (RegisterPatientRequest)  returns (RegisterAck);
 }
 
 service PatientService {
-    rpc CreatePatient (CreatePatientRequest) returns (PatientId);
-    rpc UpdatePatient (UpdatePatientRequest) returns (Patient);
-    rpc DeletePatient (PatientId) returns (google.protobuf.Empty);
-    
-    rpc ListPatients (google.protobuf.Empty) returns (PatientList);
-    rpc ListHospitalsOfPatient (PatientId) returns (HospitalList);
+    rpc CreatePatient (CreatePatientRequest)      returns (PatientId);
+    rpc UpdatePatient (UpdatePatientRequest)      returns (Patient);
+    rpc DeletePatient (PatientId)                 returns (DeletePatientResponse);
+    rpc ListPatients (ListPatientsRequest)        returns (PatientList);
+    rpc ListHospitalsOfPatient (PatientId)        returns (HospitalList);
 }
 
-// ------------ Messages ------------
+enum Sex {
+    SEX_UNSPECIFIED = 0;
+    MALE = 1;
+    FEMALE = 2;
+    OTHER = 3;
+}
+
+message LocalDate {
+    int32 year = 1;
+    int32 month = 2;
+    int32 day = 3;
+}
 
 message HospitalId {
     string id = 1;
@@ -45,6 +51,8 @@ message Hospital {
 message Patient {
     string id = 1;
     string name = 2;
+    Sex sex = 3;
+    LocalDate dob = 4;
 }
 
 message CreateHospitalRequest {
@@ -58,11 +66,26 @@ message UpdateHospitalRequest {
 
 message CreatePatientRequest {
     string name = 1;
+    Sex sex = 2;
+    LocalDate dob = 3;
 }
 
 message UpdatePatientRequest {
     string id = 1;
     string name = 2;
+    Sex sex = 3;
+    LocalDate dob = 4;
+}
+
+message RegisterPatientRequest {
+    string patient_id = 1;
+    string hospital_id = 2;
+}
+
+message RegisterAck {
+    bool registered = 1;
+    string patient_id = 2;
+    string hospital_id = 3;
 }
 
 message HospitalTuple {
@@ -81,4 +104,18 @@ message HospitalList {
 
 message PatientList {
     repeated PatientTuple patients = 1;
+}
+
+message ListHospitalsRequest {}
+
+message ListPatientsRequest {}
+
+message DeleteHospitalResponse {
+    bool deleted = 1;
+    string id = 2;
+}
+
+message DeletePatientResponse {
+    bool deleted = 1;
+    string id = 2;
 }
