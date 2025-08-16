@@ -28,7 +28,7 @@ Duplicate names are allowed; identity is by UUID.
   - Delete non-existent patient → `deleted=false`
   - List patients returns Alice/Bob/Charlie with correct UUID <-> name pairs
 
-## Deletion
+### Deletion
 
 - Deleting a hospital does **not** delete patients.
 - Deleting a patient does **not** delete hospitals.
