@@ -80,7 +80,7 @@ Given `hospitalId` and “now”:
 
 At most `120 × |S|` lookups (<= 480), which is effectively constant.
 
-### Retention
+## Retention
 
 To keep storage bounded:
 
