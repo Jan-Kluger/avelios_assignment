@@ -1,4 +1,4 @@
-# Hospital gRPC Service — Implementation Notes
+# Hospital Service
 
 Implements the brief with gRPC endpoints to:
 
@@ -10,15 +10,11 @@ Implements the brief with gRPC endpoints to:
 
 Duplicate names are allowed; identity is by UUID.
 
----
-
-## Run
+### Run
 
 - Build & start: `./gradlew bootRun` (gRPC on port 9090)
 
----
-
-## Tests
+### Tests
 
 - Run: `./gradlew test`
 - Uses a **test profile** (H2 create-drop, in-process gRPC server; no TCP port).
@@ -32,9 +28,7 @@ Duplicate names are allowed; identity is by UUID.
   - Delete non-existent patient → `deleted=false`
   - List patients returns Alice/Bob/Charlie with correct UUID <-> name pairs
 
----
-
-## Deletion semantics
+## Deletion
 
 - Deleting a hospital does **not** delete patients.
 - Deleting a patient does **not** delete hospitals.
@@ -45,14 +39,12 @@ Duplicate names are allowed; identity is by UUID.
 
 # Special request - Monthly-Bucket Algorithm:
 
-## Overview
+### Overview
 
 Maintain fixed-size **monthly buckets** per hospital and sex to answer:
 
 > “Average age of visitors per month, by sex, for the last 10 years”  
 > in predictable, sub-200 ms time.
-
----
 
 ## Data Stored
 
@@ -66,9 +58,7 @@ Where:
 - `visits_count` = number of visits in that bucket.
 - `age_days_sum` = sum of `daysBetween(patientDOB, visitDate)` over visits in the bucket.
 
----
-
-## Update Operation (Per Visit) — O(1)
+### Update Operation (Per Visit) — O(1)
 
 1. Compute `bucketMonth = floorMonth(visitDate)`.
 2. Compute `ageDays = daysBetween(DOB, visitDate)`.
@@ -78,9 +68,7 @@ Where:
 
 Expected constant time with a hash map; effectively constant with a DB.
 
----
-
-## Query Operation (Last 10 Years) — O(120 × |S|) ≈ O(1)
+### Query Operation (Last 10 Years) — O(120 × |S|) ≈ O(1)
 
 Given `hospitalId` and “now”:
 
@@ -93,26 +81,20 @@ Given `hospitalId` and “now”:
 
 At most `120 × |S|` lookups (<= 480), which is effectively constant.
 
----
-
-## Complexity
+### Complexity
 
 - **Time (update):** O(1) per visit.
 - **Time (query):** O(120 × |S|) ~ O(1).
 - **Space:** O(#hospitals × 120 × |S|) ~ O(1) (if each hospital only stores their own instance -> |H| = 1).
 
----
-
-## Retention
+### Retention
 
 To keep storage bounded:
 
 - Scheduled job deletes raw `Visit` rows older than 10 years.
 - Queries always filter to the last 120 months.
 
----
-
-## Mid-Month Granularity Issue
+### Mid-Month Granularity Issue
 
 Buckets are **monthly**, so mid-month requests raise a policy choice:
 
